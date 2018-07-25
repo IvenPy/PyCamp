@@ -1,41 +1,44 @@
-RUS_TO_EN_EXT = {
-            'г': 'g',
-            'ё': 'yo',
-            'м':'m',
-            'ф':'f',
-            'х':'h',
-            'ч':'ch',
-            'ш':'sh',
-            'щ':'sh',
-            'ы':'u',
-            'й':'y',
-            'ю':'yu',
-            'я':'ya',
-            'з':'z',
-            'ж':'zh',
-            'ь':'',
-            'ъ':''
-            }
+import argparse
+import os
 
-EX_RUS = "Эта строка будет подверена транслитерации".replace(' ','').lower()
+RUS_TO_EN_EXT = {
+    'г': 'g', 'ё': 'yo',
+    'м': 'm', 'ф': 'f',
+    'х': 'h', 'ч': 'ch',
+    'ш': 'sh', 'щ': 'sh',
+    'ы': 'u', 'й': 'y',
+    'ю': 'yu', 'я': 'ya',
+    'з': 'z', 'ж': 'zh',
+    'ь': '', 'ъ': ''
+}
+
+EN_TO_RUS_EXT = {}
+
+EX_RUS = "Эта строка будет подверена транслитерации".replace(' ', '').lower()
 EX_EN = "Eta stroka budet podverena transliteracii".replace(' ', '').lower()
 
-RUS_TO_EN = {EX_RUS[i]:EX_EN[i] for i in range(len(EX_RUS))}
+RUS_TO_EN = {EX_RUS[i]: EX_EN[i] for i in range(len(EX_RUS))}
 RUS_TO_EN.update(RUS_TO_EN_EXT)
+
+EN_TO_RUS = {EX_EN[i]: EX_RUS[i] for i in range(len(EX_EN))}
 
 PUNCT_MARKS = r"'\"-_\\/.,:;`~ !?\n"
 
 
 class TranslitError(Exception):
     def __init__(self, message):
-
         super(TranslitError, self).__init__(message)
 
 
 def get_translator(lan_from, lan_to):
     if lan_from == 'rus' and lan_to == 'en':
         return RUS_TO_EN
+
+    elif lan_from == 'en' and lan_to == 'rus':
+        return EN_TO_RUS
+
     raise TranslitError("There is no {} to {} translator".format(lan_from, lan_to))
+
 
 def translate(translator, text):
     translit_text = []
@@ -50,8 +53,8 @@ def translate(translator, text):
             translit_text.append(letter)
         elif letter in translator:
             if up:
-                 new_let = translator[letter.lower()].upper()
-                 translit_text.append(new_let)
+                new_let = translator[letter.lower()].upper()
+                translit_text.append(new_let)
             else:
                 translit_text.append(translator[letter])
         else:
@@ -67,6 +70,7 @@ def main():
     translator = get_translator('rus', 'en')
     translit_text = translate(translator, text)
     print("Translated text: \n" + translit_text)
+
 
 if __name__ == "__main__":
     main()
