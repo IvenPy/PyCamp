@@ -9,7 +9,14 @@ RUS_TO_EN_EXT = {
     'ь': '', 'ъ': ''
 }
 
-EN_TO_RUS_EXT = {}
+EN_TO_RUS_EXT = {
+    'z': 'з', 'c': 'k',
+    'h': 'х', 'f': 'ф',
+    'g': 'ж', 'm': 'м',
+    'q': 'ку', 'u': 'у',
+    'w': 'в', 'x': 'кс',
+    'y': 'у'
+}
 
 EX_RUS = "Эта строка будет подверена транслитерации"\
     .replace(' ', '').lower()
@@ -31,6 +38,12 @@ class TranslitError(Exception):
 
 
 def get_translator(lan_from, lan_to):
+    """
+    Return that matches symbols from one language to another
+    :param lan_from:
+    :param lan_to:
+    :return:
+    """
     if lan_from == 'rus' and lan_to == 'en':
         return RUS_TO_EN
 
@@ -42,6 +55,13 @@ def get_translator(lan_from, lan_to):
 
 
 def translate(translator, text):
+    """
+    Translates text with specifed translator on text.
+    Throws exception if unknown symbol for translator in text
+    :param translator: dict that matches symbols from one language to another
+    :param text:
+    :return: translated text in string
+    """
     translit_text = []
     for letter in text:
         up = False

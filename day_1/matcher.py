@@ -20,6 +20,7 @@ def calculate_matches(dicts):
 
 
 def create_data():
+    """Return list of dicts of rundom data using template"""
     template = ['id', 'success', 'name', ]
     data_list = []
     factory = faker.Faker()
@@ -49,6 +50,7 @@ def check_path_validation(path):
 
 
 def extract_data(path):
+    """Extracts data from csv file"""
     data = []
     with open(path, 'r') as csv_file:
         reader = csv.DictReader(csv_file)
