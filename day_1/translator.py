@@ -1,3 +1,23 @@
+"""
+This module provides transliterations between to languages.
+However for know it is only english and russian languages.
+If you want others too create dictionary that matches letters from one
+language to another.
+For more information read functions docs or read code.
+
+    Example:
+        translator = get_translator('rus', 'en')
+        text = 'Эта строка будет подверена транслитерации'
+        translited_text = translate(translator, text)
+
+
+        text == 'Eta stroka budet podverena transliteracii'
+
+Enjoy
+"""
+
+import string
+
 RUS_TO_EN_EXT = {
     'г': 'g', 'ё': 'yo',
     'м': 'm', 'ф': 'f',
@@ -24,12 +44,15 @@ EX_RUS = "Эта строка будет подверена транслитер
 EX_EN = "Eta stroka budet podverena transliteracii"\
     .replace(' ', '').lower()
 
+# creating transliterator from rus to en language
+
 RUS_TO_EN = {EX_RUS[i]: EX_EN[i] for i in range(len(EX_RUS))}
 RUS_TO_EN.update(RUS_TO_EN_EXT)
 
-EN_TO_RUS = {EX_EN[i]: EX_RUS[i] for i in range(len(EX_EN))}
+# creating transliterator from en to rus language
 
-PUNCT_MARKS = r"'\"-_\\/.,:;`~ !?\n"
+EN_TO_RUS = {EX_EN[i]: EX_RUS[i] for i in range(len(EX_EN))}
+EN_TO_RUS.update(EN_TO_RUS_EXT)
 
 
 class TranslitError(Exception):
@@ -39,10 +62,14 @@ class TranslitError(Exception):
 
 def get_translator(lan_from, lan_to):
     """
-    Return that matches symbols from one language to another
-    :param lan_from:
-    :param lan_to:
-    :return:
+    Return translator that matches symbols from one language to another
+
+    Args:
+        lan_from: language name from what you want to transliterate
+        lan_to: language name that you want to transliterate to.
+
+    Returns: dict of matching letters
+
     """
     if lan_from == 'rus' and lan_to == 'en':
         return RUS_TO_EN
@@ -56,11 +83,15 @@ def get_translator(lan_from, lan_to):
 
 def translate(translator, text):
     """
-    Translates text with specifed translator on text.
-    Throws exception if unknown symbol for translator in text
-    :param translator: dict that matches symbols from one language to another
-    :param text:
-    :return: translated text in string
+    Translates text with specified translator.
+    Throws exception if unknown symbol for translator occurs in text
+
+    Args:
+        translator: dict that matches symbols from one language to another
+        text: text to transliterate
+
+    Returns: string representation of translated text
+
     """
     translit_text = []
     for letter in text:
@@ -70,7 +101,7 @@ def translate(translator, text):
             up = True
         letter = letter.lower()
 
-        if letter in PUNCT_MARKS or letter.isdigit() or letter.isspace():
+        if letter in string.punctuation or letter.isdigit() or letter.isspace():
             translit_text.append(letter)
         elif letter in translator:
             if up:

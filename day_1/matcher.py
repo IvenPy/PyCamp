@@ -1,11 +1,33 @@
+"""
+This module provides calculating matches
+keys with the same arguments.
+
+Have fun
+"""
+
 import random
 import argparse
 import os
+import os.path
 import csv
 import faker
 
 
 def calculate_matches(dicts):
+    """
+    Calculate matches of keys with the same values
+    Args:
+        dicts: list of dicts
+
+    Returns:
+        list of dicts, where dict structure is
+        {
+        'key': some_key,
+        'value' some_value,
+        'count' number of matches
+        }
+
+    """
     d_keys = {}  # key:[value, count]
     for d in dicts:
         for key in d:
@@ -20,7 +42,13 @@ def calculate_matches(dicts):
 
 
 def create_data():
-    """Return list of dicts of rundom data using template"""
+    """
+
+    Creates data for template
+
+    Returns: list of dicts of random data using template
+
+    """
     template = ['id', 'success', 'name', ]
     data_list = []
     factory = faker.Faker()
@@ -31,7 +59,12 @@ def create_data():
     return data_list
 
 
-def get_file_args():
+def get_args():
+    """
+
+    Returns: Arguments from CMD
+
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--file',
                         help='specifying path to file that will be translated')
@@ -40,9 +73,20 @@ def get_file_args():
 
 
 def check_path_validation(path):
+    """
+    Check that file in path exist and has extension .csv.
+    Otherwise throws OSError with appropriate message
+
+    Args:
+        path: path to file
+
+    Returns: None
+
+    """
+    print(os.path.exists(path))
     if not path:
         raise OSError("File name wasn't specified")
-    if not os.path.exists(path) or not os.path.isfile(path):
+    if not os.path.exists(path): # or not os.path.isfile(path)
         raise OSError("File {} doesn't exist".format(path))
     if not path.endswith('.csv'):
         raise OSError("File {} is supposed to be in csv extension"
@@ -50,7 +94,15 @@ def check_path_validation(path):
 
 
 def extract_data(path):
-    """Extracts data from csv file"""
+    """
+    Extracts data from .csv file
+
+    Args:
+        path: file with .csv extension
+
+    Returns: list of dicts of extracted data
+
+    """
     data = []
     with open(path, 'r') as csv_file:
         reader = csv.DictReader(csv_file)
@@ -63,6 +115,15 @@ def extract_data(path):
 
 
 def write_data(path, data):
+    """
+    Write data to path in csv format
+    Args:
+        path: path to file
+        data: list of dicts
+
+    Returns: None, dummy
+
+    """
     keys = data[0].keys()
     with open(path, 'w') as csv_file:
         reader = csv.DictWriter(csv_file, keys)
@@ -71,7 +132,7 @@ def write_data(path, data):
 
 
 def main():
-    args = get_file_args()
+    args = get_args()
     path = args.file
     # path = 'users_data.csv'
     check_path_validation(path)
