@@ -1,6 +1,3 @@
-import argparse
-import os
-
 RUS_TO_EN_EXT = {
     'г': 'g', 'ё': 'yo',
     'м': 'm', 'ф': 'f',
@@ -14,8 +11,11 @@ RUS_TO_EN_EXT = {
 
 EN_TO_RUS_EXT = {}
 
-EX_RUS = "Эта строка будет подверена транслитерации".replace(' ', '').lower()
-EX_EN = "Eta stroka budet podverena transliteracii".replace(' ', '').lower()
+EX_RUS = "Эта строка будет подверена транслитерации"\
+    .replace(' ', '').lower()
+
+EX_EN = "Eta stroka budet podverena transliteracii"\
+    .replace(' ', '').lower()
 
 RUS_TO_EN = {EX_RUS[i]: EX_EN[i] for i in range(len(EX_RUS))}
 RUS_TO_EN.update(RUS_TO_EN_EXT)
@@ -37,7 +37,8 @@ def get_translator(lan_from, lan_to):
     elif lan_from == 'en' and lan_to == 'rus':
         return EN_TO_RUS
 
-    raise TranslitError("There is no {} to {} translator".format(lan_from, lan_to))
+    raise TranslitError("There is no {} to {} translator"
+                        .format(lan_from, lan_to))
 
 
 def translate(translator, text):

@@ -13,7 +13,10 @@ def calculate_matches(dicts):
                 d_keys[d[key]] = [key, d_keys[d[key]][1] + 1]
             else:
                 d_keys[d[key]] = [key, 1]
-    return [{'key': d_keys[x][0], 'value': x, 'count': d_keys[x][1]} for x in d_keys]
+    return [{'key': d_keys[x][0],
+             'value': x,
+             'count': d_keys[x][1]}
+            for x in d_keys]
 
 
 def create_data():
@@ -41,7 +44,8 @@ def check_path_validation(path):
     if not os.path.exists(path) or not os.path.isfile(path):
         raise OSError("File {} doesn't exist".format(path))
     if not path.endswith('.csv'):
-        raise OSError("File {} is supposed to be in csv extension".format(path))
+        raise OSError("File {} is supposed to be in csv extension"
+                      .format(path))
 
 
 def extract_data(path):
