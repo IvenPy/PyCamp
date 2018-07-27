@@ -10,6 +10,7 @@ Example:
 Pretty easy, right?
 """
 
+
 def merge_dicts(dict_1, dict_2):
     """
     Updates 2 dicts, if intersection occurs
