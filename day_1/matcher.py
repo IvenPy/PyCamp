@@ -8,7 +8,6 @@ Have fun
 import random
 import argparse
 import os
-import os.path
 import csv
 import faker
 
@@ -16,6 +15,7 @@ import faker
 def calculate_matches(dicts):
     """
     Calculate matches of keys with the same values
+
     Args:
         dicts: list of dicts
 
@@ -43,11 +43,9 @@ def calculate_matches(dicts):
 
 def create_data():
     """
-
     Creates data for template
 
     Returns: list of dicts of random data using template
-
     """
     template = ['id', 'success', 'name', ]
     data_list = []
@@ -61,9 +59,7 @@ def create_data():
 
 def get_args():
     """
-
     Returns: Arguments from CMD
-
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--file',
@@ -83,10 +79,9 @@ def check_path_validation(path):
     Returns: None
 
     """
-    print(os.path.exists(path))
     if not path:
         raise OSError("File name wasn't specified")
-    if not os.path.exists(path): # or not os.path.isfile(path)
+    if not os.path.exists(path) or not os.path.isfile(path):
         raise OSError("File {} doesn't exist".format(path))
     if not path.endswith('.csv'):
         raise OSError("File {} is supposed to be in csv extension"
@@ -117,12 +112,12 @@ def extract_data(path):
 def write_data(path, data):
     """
     Write data to path in csv format
+
     Args:
         path: path to file
         data: list of dicts
 
-    Returns: None, dummy
-
+    Returns: None
     """
     keys = data[0].keys()
     with open(path, 'w') as csv_file:
