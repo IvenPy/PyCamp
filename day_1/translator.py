@@ -10,7 +10,6 @@ For more information read functions docs or read code.
         text = 'Эта строка будет подверена транслитерации'
         translited_text = translate(translator, text)
 
-
         text == 'Eta stroka budet podverena transliteracii'
 
 Enjoy

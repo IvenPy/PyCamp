@@ -9,28 +9,23 @@ import random
 import string
 
 
-def get_context():
+def get_context(keys_set):
     """
+    Takes a set (or any iterable object where all elements are hashable)
+    of keys and return dict filled with random strings
 
-    Creates dict of data, for tests
     Returns:
-        dict:
-
+        dict: key(hashable object) -> string
     """
+    dict_data = {}
     f = faker.Faker()
-    return {
-        'id': random.randint(0, 100),
-        'name': f.name(),
-        'email': f.email(),
-        'job': f.job(),
-        'country': f.country(),
-        'age': random.randint(0, 100)
-    }
+    for x in keys_set:
+        dict_data[x] = f.word()
+    return dict_data
 
 
 def check_validation(template, dict_data):
     """
-
     Check if template string can be filled with parameters from dict_data
     In case success return filled string, unless return False
 
@@ -42,21 +37,19 @@ def check_validation(template, dict_data):
         string: template with filled parameters
 
     """
-    str_filled = False
     context = string.Template(template.replace("{", "${"))
     try:
         str_filled = context.substitute(dict_data)
+        return str_filled
     except KeyError as e:
-        KeyError("Following key not found: {}".format(e))
+        raise KeyError("Following key not found: {}".format(e)) from e
 
     except BaseException as e:
         print(e.args)
-    finally:
-        return str_filled
 
 
 def main():
-    data = get_context()
+    data = get_context({'name', 'age', 'job', 'a', 'c'})
     print(check_validation("{name}, {age}, {job}, {a}, {c}", data))
 
 
