@@ -12,5 +12,4 @@ def reverse_iter(collection):
 
 
 if __name__ == '__main__':
-    l = [1, 2, 3, 4]
-    print(list(reverse_iter(l)))
+    pass
