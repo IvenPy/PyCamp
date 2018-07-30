@@ -19,7 +19,7 @@ class MyTestCase(unittest.TestCase):
     @mock.patch("day_1.matcher.os")
     def test_invalid_path(self, mock_os, mock_path):
         path = "some/invalid/path"
-        with self.assertRaises(OSError) as e:
+        with self.assertRaises(OSError):
             test_path_validation_template(mock_path, exists=False,
                                           isfile=False, path=path)
 

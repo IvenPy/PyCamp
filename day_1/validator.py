@@ -5,7 +5,6 @@ can be filled with the specified dict
 
 """
 import faker
-import random
 import string
 
 

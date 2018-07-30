@@ -1,13 +1,12 @@
 import unittest
-import day_1
-from unittest import mock
 from day_1 import translator
 from day_1.translator import TranslitError
+
 
 class MyTestCase(unittest.TestCase):
 
     def test_translator_not_found(self):
-        with self.assertRaises(TranslitError) as e:
+        with self.assertRaises(TranslitError):
             unkown_trans = translator.get_translator("lalala", "blablabla")
 
     def test_getting_known_translator(self):
@@ -15,7 +14,7 @@ class MyTestCase(unittest.TestCase):
         self.assertDictEqual(translator.EN_TO_RUS, known_translator)
 
     def test_fail_on_unknown_symbol(self):
-        with self.assertRaises(TranslitError) as e:
+        with self.assertRaises(TranslitError):
             en_rus_trans = translator.get_translator("en", "rus")
             translator.translate(en_rus_trans, "خنده دار")
 

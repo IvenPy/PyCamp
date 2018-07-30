@@ -6,7 +6,7 @@ class MyTestCase(unittest.TestCase):
     def test_wrong_keys(self):
         data = validator.get_context({'name', 'id', 'nick', 'action'})
         template = "{name} {id} and {action} {job}"
-        with self.assertRaises(KeyError) as e:
+        with self.assertRaises(KeyError):
             validator.check_validation(template, data)
 
     def test_correct_template(self):
