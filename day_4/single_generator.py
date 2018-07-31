@@ -1,19 +1,12 @@
+class Integers():
+    Index = 0
 
+    def __iter__(self):
+        return self
 
-I = 0  # global index
-
-
-def integers():
-    """
-    Singleton generator of integers
-
-    Returns:
-        int
-    """
-    global I
-    while True:
-        I += 1
-        yield I
+    def __next__(self):
+        self.Index += 1
+        return self.Index
 
 
 if __name__ == '__main__':
