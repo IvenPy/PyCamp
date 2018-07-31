@@ -1,12 +1,16 @@
-class Integers():
-    Index = 0
+class Integers:
+    Index = None
+
+    def __init__(self):
+        if not self.Index:
+            Integers.Index = 0
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        self.Index += 1
-        return self.Index
+        Integers.Index += 1
+        return Integers.Index
 
 
 if __name__ == '__main__':

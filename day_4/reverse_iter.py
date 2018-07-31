@@ -1,3 +1,6 @@
+import types
+
+
 def reverse_iter(collection):
     """
     Generator objects from collection in reverse order
@@ -7,6 +10,8 @@ def reverse_iter(collection):
     Returns:
 
     """
+    if isinstance(type(collection), types.GeneratorType):
+        collection = tuple(collection)
     for x in collection[::-1]:
         yield x
 
