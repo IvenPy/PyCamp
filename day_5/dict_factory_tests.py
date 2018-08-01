@@ -76,14 +76,16 @@ class MyTestCase(unittest.TestCase):
         self.assertIsNone(self.read_modify_add_del_dict.__setitem__("new attribute", "smth new"))
 
     def test_nested_dict(self):
-        nest_dict = DictFactory.factory({"name": "Thor", 'info': {'age': 10, 'secret': 12, 'smt': {'nana': 2, 'ra': 4}}},
+        nest_dict = DictFactory.factory({"name": "Thor", 'info': {'age': 10, 'secret': 12,
+                                                                  'smt': {'nana': 2, 'ra': 4}}},
                                         read=True, modify=True, delete=True, add=True)
-        print(type(nest_dict.info.smt))
-        print(isinstance(self.read_modify_add_del_dict, dict))
+        nest_dict.name.go = 'go'
         nest_dict.info.smt.gog = 12
+        nest_dict.info.secret.a = 7
         print(nest_dict.info.smt)
         del nest_dict.info.smt.nana
         print(nest_dict.info.smt)
+
 
 if __name__ == '__main__':
     unittest.main()
