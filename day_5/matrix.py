@@ -1,22 +1,30 @@
 """
-
-
-
 """
+import copy
 
 
 class Matrix:
 
-    def __init__(self, rows):
-        self.matrix = rows
+    def __init__(self, matrix):
+        self.__matrix = self.__set_matrix(matrix)
         self.__size = 0, 0
-        self.check_matrix()
+        self.__check_matrix()
 
     @property
     def size(self):
         return self.__size
 
-    def check_matrix(self):
+    @property
+    def matrix(self):
+        return self.__matrix
+
+    def __set_matrix(self, matrix):
+        intern_matrix = []
+        for row in matrix:
+            intern_matrix.append(list(copy.deepcopy(row)))
+        return intern_matrix
+
+    def __check_matrix(self):
         """
         Checking created matrix on
         dimension. Fails if matrix is empty list or
@@ -35,31 +43,31 @@ class Matrix:
                                  .format(ind, row, y))
         self.__size = (x, y)
 
+    def check_instance(self, other):
+        if not isinstance(other, Matrix):
+            raise TypeError("Not supported operation:"
+                            " + on Matrix and {}"
+                            .format(type(other)))
+
+        if self.size != other.size:
+            raise ValueError("Matrix {} and {}"
+                             " have different size"
+                             .format(self.matrix, other.matrix))
+
     def __add__(self, other):
         """
         Addition of two matrix. Fails if
-        matrixes have different dimensions
+        matrices have different dimensions
         Args:
             other: matrix
 
         Returns: matrix: sum of two matrix
 
         """
-        if not isinstance(other, Matrix):
-            raise TypeError("Not supported operation:"
-                            " add on Matrix and {}"
-                            .format(type(other)))
-
-        if self.__size != other.size:
-            raise ValueError("Matrix {} and {}"
-                             " have different size"
-                             .format(self.matrix, other.matrix))
-
-        matrix_sum = []
-        for x in range(0, self.__size[0]):
-            matrix_sum.append([])
-            for y in range(0, self.__size[1]):
-                matrix_sum[x].append(self.matrix[x][y] + other.matrix[x][y])
+        self.check_instance(other)
+        matrix_sum = [[self.matrix[x][y] + other.matrix[x][y]
+                       for y in range(self.size[1])]
+                      for x in range(self.size[0])]
         return Matrix(matrix_sum)
 
     def T(self):
@@ -75,38 +83,41 @@ class Matrix:
     def __sub__(self, other):
         """
         Subtract of two matrixes. Fails if
-        matrixes have different dimensions
+        matrices have different dimensions
         Args:
             other: matrix
 
         Returns: matrix: sum of two matrix
-
         """
-        if not isinstance(other, Matrix):
-            raise TypeError("Not supported operation:"
-                            " add on Matrix and {}"
-                            .format(type(other)))
-
-        if self.__size != other.size:
-            raise ValueError("Matrix {} and {}"
-                             " have different size"
-                             .format(self.matrix, other.matrix))
-
-        matrix_sum = []
-        for x in range(0, self.__size[0]):
-            matrix_sum.append([])
-            for y in range(0, self.__size[1]):
-                matrix_sum[x].append(self.matrix[x][y] - other.matrix[x][y])
+        self.check_instance(other)
+        matrix_sum = [[self.matrix[x][y] - other.matrix[x][y]
+                       for y in range(self.size[1])]
+                      for x in range(self.size[0])]
         return Matrix(matrix_sum)
 
+    @staticmethod
+    def create_matrix(size, value):
+        return Matrix([[value for row in range(size[1])]
+                       for col in range(size[0])])
+
     def __mul__(self, other):
+        """
+        Multiplying of two matrices or matrix and int. Fails if
+        matrices have different dimensions
+        Args:
+            other: matrix
+
+        Returns: matrix: multiplying of two matrix
+
+        """
         if type(other) is Matrix:
-            if self.__size != tuple(reversed(other.size)):
+            if self.size[0] != other.size[1]:
                 raise ValueError("Matrix {} and {} have different dimensions"
                                  .format(self, other))
 
-            mult_matrix = [[0 for row in range(self.__size[0])]
-                           for col in range(other.size[1])]
+            mult_matrix = Matrix.create_matrix((
+                self.size[0], other.size[1]), 0) \
+                .matrix
 
             for rows_s in range(self.__size[0]):
                 for cols_o in range(other.size[1]):
@@ -115,14 +126,13 @@ class Matrix:
                             self.matrix[rows_s][cols_s] * other.matrix[cols_s][cols_o]
 
         elif type(other) is int:
-            mult_matrix = []
+            mult_matrix = [[self.matrix[x][y] * other
+                            for y in range(self.size[1])]
+                           for x in range(self.size[0])]
 
-            for x in range(0, self.__size[0]):
-                mult_matrix.append([])
-                for y in range(0, self.__size[1]):
-                    mult_matrix[x].append(self.matrix[x][y] * other)
         else:
-            raise ValueError()
+            raise TypeError("Unsupported operand * for Matrix and {}"
+                            .format(type(other)))
 
         return Matrix(mult_matrix)
 
@@ -131,6 +141,17 @@ class Matrix:
         return mult_matrix
 
     def __pow__(self, power, modulo=None):
+        """
+        Exponentiation matrix on itself power times
+        Args:
+            power:
+            modulo:
+
+        Returns:
+
+        """
+        if power == 0:
+            return Matrix.create_matrix(self.size, 1)
         mult_matrix = self
         for x in range(power - 1):
             mult_matrix = self.__mul__(mult_matrix)
