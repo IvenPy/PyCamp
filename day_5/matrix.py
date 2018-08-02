@@ -3,12 +3,18 @@
 
 
 """
+
+
 class Matrix:
 
     def __init__(self, rows):
         self.matrix = rows
-        self.size = 0, 0
+        self.__size = 0, 0
         self.check_matrix()
+
+    @property
+    def size(self):
+        return self.__size
 
     def check_matrix(self):
         """
@@ -27,7 +33,7 @@ class Matrix:
             if y != len(row):
                 raise ValueError("Row №{} {} not in {} lenght"
                                  .format(ind, row, y))
-        self.size = (x, y)
+        self.__size = (x, y)
 
     def __add__(self, other):
         """
@@ -44,20 +50,20 @@ class Matrix:
                             " add on Matrix and {}"
                             .format(type(other)))
 
-        if self.size != other.size:
+        if self.__size != other.size:
             raise ValueError("Matrix {} and {}"
                              " have different size"
                              .format(self.matrix, other.matrix))
 
         matrix_sum = []
-        for x in range(0, self.size[0]):
+        for x in range(0, self.__size[0]):
             matrix_sum.append([])
-            for y in range(0, self.size[1]):
+            for y in range(0, self.__size[1]):
                 matrix_sum[x].append(self.matrix[x][y] + other.matrix[x][y])
         return Matrix(matrix_sum)
 
     def T(self):
-        pass
+        return Matrix([list(i) for i in zip(*self.matrix)])
 
     def __radd__(self, other):
         return Matrix.__add__(self, other)
@@ -81,39 +87,39 @@ class Matrix:
                             " add on Matrix and {}"
                             .format(type(other)))
 
-        if self.size != other.size:
+        if self.__size != other.size:
             raise ValueError("Matrix {} and {}"
                              " have different size"
                              .format(self.matrix, other.matrix))
 
         matrix_sum = []
-        for x in range(0, self.size[0]):
+        for x in range(0, self.__size[0]):
             matrix_sum.append([])
-            for y in range(0, self.size[1]):
+            for y in range(0, self.__size[1]):
                 matrix_sum[x].append(self.matrix[x][y] - other.matrix[x][y])
         return Matrix(matrix_sum)
 
     def __mul__(self, other):
         if type(other) is Matrix:
-            if self.size != tuple(reversed(other.size)):
+            if self.__size != tuple(reversed(other.size)):
                 raise ValueError("Matrix {} and {} have different dimensions"
                                  .format(self, other))
 
-            mult_matrix = [[0 for row in range(self.size[0])]
-                           for col in range(self.size[0])]
+            mult_matrix = [[0 for row in range(self.__size[0])]
+                           for col in range(other.size[1])]
 
-            for rows_s in range(self.size[0]):
+            for rows_s in range(self.__size[0]):
                 for cols_o in range(other.size[1]):
-                    for cols_s in range(self.size[1]):
+                    for cols_s in range(self.__size[1]):
                         mult_matrix[rows_s][cols_o] += \
                             self.matrix[rows_s][cols_s] * other.matrix[cols_s][cols_o]
 
         elif type(other) is int:
             mult_matrix = []
 
-            for x in range(0, self.size[0]):
+            for x in range(0, self.__size[0]):
                 mult_matrix.append([])
-                for y in range(0, self.size[1]):
+                for y in range(0, self.__size[1]):
                     mult_matrix[x].append(self.matrix[x][y] * other)
         else:
             raise ValueError()
@@ -125,6 +131,7 @@ class Matrix:
         return mult_matrix
 
     def __pow__(self, power, modulo=None):
+        mult_matrix = self
         for x in range(power - 1):
-            mult_matrix = self.__mul__(self)
+            mult_matrix = self.__mul__(mult_matrix)
         return mult_matrix

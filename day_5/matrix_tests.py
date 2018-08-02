@@ -42,6 +42,11 @@ class MyTestCase(unittest.TestCase):
         m2 = m1 ** 2
         self.assertEqual(m2.matrix, [[7, 10], [15, 22]])
 
+    def test_transposition(self):
+        m1 = Matrix([[1, 2], [3, 4], [5, 6]])
+        m2 = m1.T()
+        self.assertEqual(m2.matrix, [[1, 3, 5], [2, 4, 6]])
+
 
 
 if __name__ == '__main__':
