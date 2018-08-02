@@ -36,10 +36,10 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual((1, 2, 3), (self.read_modify_del_dict.a,
                                      self.read_modify_del_dict.b,
                                      self.read_modify_del_dict.c))
-
-        self.assertEqual((1, 2, 3), (self.read_modify_add_del_dict.a,
-                                     self.read_modify_add_del_dict.b,
-                                     self.read_modify_add_del_dict.c))
+        #
+        # self.assertEqual((1, 2, 3), (self.read_modify_add_del_dict.a,
+        #                              self.read_modify_add_del_dict.b,
+        #                              self.read_modify_add_del_dict.c))
 
     def test_modifying(self):
         self.read_modify_dict.a = 0
@@ -56,6 +56,7 @@ class MyTestCase(unittest.TestCase):
     def test_delete_attribute(self):
         with self.assertRaises(AttributeError):
             del self.read_only_dict.a
+
         with self.assertRaises(AttributeError):
             del self.read_modify_dict.a
 
@@ -63,28 +64,24 @@ class MyTestCase(unittest.TestCase):
 
         self.assertIsNone(self.read_modify_add_del_dict.__delattr__('a'))
 
-    def test_adding(self):
         with self.assertRaises(AttributeError):
+            del self.read_modify_del_dict.a
+
+        with self.assertRaises(AttributeError):
+            del self.read_modify_add_del_dict.a
+
+    def test_adding(self):
+        with self.assertRaises(AttributeError) as e:
             self.read_only_dict.new_attribute = "smth new"
 
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(AttributeError) as e:
             self.read_modify_dict.new_attribute = "smth new"
 
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(AttributeError) as e:
             self.read_modify_del_dict.new_attribute = "smth new"
 
-        self.assertIsNone(self.read_modify_add_del_dict.__setitem__("new attribute", "smth new"))
-
-    def test_nested_dict(self):
-        nest_dict = DictFactory.factory({"name": "Thor", 'info': {'age': 10, 'secret': 12,
-                                                                  'smt': {'nana': 2, 'ra': 4}}},
-                                        read=True, modify=True, delete=True, add=True)
-        nest_dict.name.go = 'go'
-        nest_dict.info.smt.gog = 12
-        nest_dict.info.secret.a = 7
-        print(nest_dict.info.smt)
-        del nest_dict.info.smt.nana
-        print(nest_dict.info.smt)
+        self.read_modify_add_del_dict.d = 4
+        self.assertEqual(self.read_modify_add_del_dict.d, 4)
 
 
 if __name__ == '__main__':
