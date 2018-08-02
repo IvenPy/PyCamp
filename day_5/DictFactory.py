@@ -1,118 +1,97 @@
-class Permissions:
-    def __init__(self, read, modify, add, delete):
-        self.read = read
-        self.modify = modify
-        self.add = add
-        self.delete = delete
+import copy
 
 
-class ReadOnlyDict(dict):
+class ReadOnlyDict:
+    """
+    ReadOnlyDict is decorator over class dict. Instead
+    of using [] to get required items you can access to them using
+    .name_of_attribute.
+    Note that you can't create new attributes or change existing one in this class.
+    At attempt to modify, delete or add attribute AttributeError will be occurred
+    Also accessing, deleting, modifying to not existing attributes will cause AttributeError
+    """
     def __init__(self, wrapped_dict):
-        super(ReadOnlyDict, self).__init__(wrapped_dict)
+        self._set_initials('wrapped_dict', copy.deepcopy(wrapped_dict))
 
-    def __getattr__(self, item):
-        if not super(ReadOnlyDict, self).__contains__(item):
-            raise AttributeError("Key {} wasn't found".format(item))
-        else:
-            value = super(ReadOnlyDict, self).__getitem__(item)
-            if isinstance(super(ReadOnlyDict, self).__getitem__(item), dict):
-                super(ReadOnlyDict, self).__setitem__(item, ReadOnlyDict(value))
-            return super(ReadOnlyDict, self).__getitem__(item)
+    def _set_initials(self, name, value):
+        """ This function remove redundancy while creating
+            an object at __init__
+        Args:
+            name (str): namespace in this class
+            value (obj): value of this namespace
+        Returns:
+            object: prepared base object with __setattr__
+        """
+        object.__setattr__(self, name, value)
 
     def __setattr__(self, key, value):
         raise AttributeError("You cannot add and modify attributes in ReadOnlyDict")
+
+    def __getattr__(self, item):
+        if item not in self.wrapped_dict:
+            raise AttributeError("Attribute {} wasn't found".format(item))
+        value = self.wrapped_dict.get(item)
+        if isinstance(value, dict):
+            self.wrapped_dict[item] = self.__class__(value)
+        return self.wrapped_dict.get(item)
 
     def __delattr__(self, item):
         raise AttributeError("You cannot delete attributes in ReadOnlyDict")
 
 
-class ReadModifyDict(dict):
+class ReadModifyDict(ReadOnlyDict):
+    """
+    ReadModifyDict is a heir of ReadOnlyDict
+    with one change - now you can modify attributes of your instance.
+    Exception AttributeError won't occur at attempt to set new value to existing attribute
+    """
     def __init__(self, wrapped_dict):
-        super(ReadModifyDict, self).__init__(wrapped_dict)
-
-    def __getattr__(self, item):
-        if not super(ReadModifyDict, self).__contains__(item):
-            raise AttributeError("Key {} wasn't found".format(item))
-        else:
-            value = super(ReadModifyDict, self).__getitem__(item)
-            if isinstance(super(ReadModifyDict, self).__getitem__(item), dict):
-                super(ReadModifyDict, self).__setitem__(item, ReadModifyDict(value))
-            return super(ReadModifyDict, self).__getitem__(item)
+        super().__init__(wrapped_dict)
 
     def __setattr__(self, key, value):
-        if not super(ReadModifyDict, self).__contains__(key):
-            raise AttributeError("You cannot add attributes in ReadModifyDict")
-        else:
-            value_in_dict = super(ReadModifyDict, self).__getitem__(key)
-            if isinstance(key, ReadModifyDict):
-                pass
-            elif isinstance(value_in_dict, dict):
-                super(ReadModifyDict, self).__setitem__(key, ReadModifyDict(value_in_dict))
-            super(ReadModifyDict, self).__setitem__(key, value)
+        if key not in self.wrapped_dict:
+            raise AttributeError("You cannot add attributes in {}".format(type(self)))
+        if isinstance(value, dict):
+            value = self.__class__(value)
+        self.wrapped_dict[key] = value
+
+
+class ReadModifyDeleteDict(ReadModifyDict):
+    """
+    ReadModifyDict is a heir of ReadModifyDict
+    with one change - now you can delete attributes of your instance.
+    """
+    def __init__(self, wrapped_dict):
+        super().__init__(wrapped_dict)
 
     def __delattr__(self, item):
-        raise AttributeError("You cannot delete attributes in ReadModifyDict")
-
-
-class ReadModifyDeleteDict(dict):
-    def __init__(self, wrapped_dict):
-        super(ReadModifyDeleteDict, self).__init__(wrapped_dict)
-
-    def __getattr__(self, item):
-        if not super(ReadModifyDeleteDict, self).__contains__(item):
-            raise AttributeError("Key {} wasn't found".format(item))
+        if item not in self.wrapped_dict:
+            raise AttributeError("Attribute {} doesn't exist".format(item))
         else:
-            value = super(ReadModifyDeleteDict, self).__getitem__(item)
-            if isinstance(super(ReadModifyDeleteDict, self).__getitem__(item), dict):
-                super(ReadModifyDeleteDict, self).__setitem__(item, ReadModifyDeleteDict(value))
-            return super(ReadModifyDeleteDict, self).__getitem__(item)
+            self.wrapped_dict.pop(item)
+
+
+class ReadModifyAddDeleteDict(ReadModifyDeleteDict):
+    """
+    ReadModifyAddDeleteDict is a heir of ReadModifyDeleteDict
+    with one change - now you can add new attributes of your instance
+    Exception won't occur at deleting, modifying and accessing to existing attribute.
+    At adding new attribute two things can happen:
+
+        1. If the object to which the attribute is added to dict or ReadModifyAddDeleteDict,
+            or any other type that allow to add attributes, adding attribute will happen
+            successfully.
+
+        2. If the object is built-in type or other type that doesn't allow
+            adding attribute exception will be thrown
+    """
+    def __init__(self, wrapped_dict):
+        super().__init__(wrapped_dict)
 
     def __setattr__(self, key, value):
-        if not super(ReadModifyDeleteDict, self).__contains__(key):
-            raise AttributeError("You cannot add attributes in ReadModifyDeleteDict")
-        else:
-            value_in_dict = super(ReadModifyDeleteDict, self).__getitem__(key)
-            if isinstance(key, ReadModifyDict):
-                pass
-            elif isinstance(value_in_dict, dict):
-                super(ReadModifyDeleteDict, self).__setitem__(key, ReadModifyDict)
-            super(ReadModifyDeleteDict, self).__setitem__(key, value)
-
-    def __delattr__(self, item):
-        if not super(ReadModifyDeleteDict, self).__contains__(item):
-            raise AttributeError("You cannot delete attributes in ReadModifyDeleteDict")
-        else:
-            super(ReadModifyDeleteDict, self).__delitem__(item)
-
-
-class ReadModifyAddDeleteDict(dict):
-    def __init__(self, wrapped_dict):
-        super(ReadModifyAddDeleteDict, self).__init__(wrapped_dict)
-
-    def __getattr__(self, item):
-        if not super(ReadModifyAddDeleteDict, self).__contains__(item):
-            raise AttributeError("Key {} wasn't found".format(item))
-        else:
-            value = super(ReadModifyAddDeleteDict, self).__getitem__(item)
-            if isinstance(super(ReadModifyAddDeleteDict, self).__getitem__(item), dict):
-                super(ReadModifyAddDeleteDict, self).__setitem__(item, ReadModifyAddDeleteDict(value))
-            return super(ReadModifyAddDeleteDict, self).__getitem__(item)
-
-    def __setattr__(self, key, value):
-        if not super(ReadModifyAddDeleteDict, self).__contains__(key):
-            super(ReadModifyAddDeleteDict, self).__setitem__(key, value)
-        value_in_dict = super(ReadModifyAddDeleteDict, self).__getitem__(key)
-        if isinstance(key, ReadModifyDict):
-            pass
-        elif isinstance(value_in_dict, dict):
-            super(ReadModifyAddDeleteDict, self).__setitem__(key, ReadModifyDict)
-        super(ReadModifyAddDeleteDict, self).__setitem__(key, value)
-
-    def __delattr__(self, item):
-        if not super(ReadModifyAddDeleteDict, self).__contains__(item):
-            raise AttributeError("You cannot delete attributes in ReadModifyDeleteDict")
-        else:
-            super(ReadModifyAddDeleteDict, self).__delitem__(item)
+        if isinstance(value, dict):
+            value = self.__class__(value)
+        self.wrapped_dict[key] = value
 
 
 class DictFactory(object):
@@ -134,3 +113,9 @@ class DictFactory(object):
 
         if read and modify and delete and add:
             return ReadModifyAddDeleteDict(wrapped_dict)
+
+        else:
+            raise ValueError("There is no such class with"
+                             " parameters read={], modify={},"
+                             " add={}, delete=[}"
+                             .format(read, modify, add, delete))
